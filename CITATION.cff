@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+title: "Viral Roulette: a calibrated Monte Carlo model of creator strategy and emergent inequality on TikTok"
+message: "If you use this model or its results, please cite it as below."
+type: software
+authors:
+  - family-names: Maan
+    given-names: Rayyan
+repository-code: "https://github.com/rayyanmaan/viral-roulette"
+abstract: >-
+  An agent-based Monte Carlo simulation of a short-video recommendation
+  platform, calibrated from four real datasets, used to test whether creator
+  strategy (niche consistency, trend chasing, quality investment, or random
+  posting) meaningfully changes follower outcomes, virality, and inequality.
+keywords:
+  - monte-carlo
+  - agent-based-modelling
+  - recommender-systems
+  - complex-systems
+  - inequality
+  - gini-coefficient
+license: MIT
+version: 1.0.0
+date-released: "2026-04-23"
