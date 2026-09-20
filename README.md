@@ -138,23 +138,20 @@ back.**
 
 ```mermaid
 flowchart LR
-    subgraph W["one simulated week"]
-        direction TB
-        TE["<b>TrendEngine</b><br/>spawn w.p. 0.12<br/>lifecycle from<br/>real Google Trends fits"]
-        CR["<b>Creator</b> x30<br/>fixed quality q<br/>content vector C(t)<br/>posts r videos"]
-        S1["<b>Stage 1</b><br/>Poisson(100) test cohort<br/><i>everyone gets this</i>"]
-        SC["<b>Score</b><br/>E = .40 complete + .25 share<br/>+ .20 like - .15 skip"]
-        S2{"E &gt; 0.35 ?"}
-        AMP["<b>amplify</b><br/>x (1 + 8(E - 0.35))"]
-        DROP["<b>drop</b><br/>no further reach"]
-        F["followers += 0.02 x impressions<br/>followers -= 0.3% churn"]
-    end
-    TE -->|topic, intensity| CR
-    CR -->|videos| S1 --> SC --> S2
+    TE["<b>TrendEngine</b><br/>spawns w.p. 0.12/week<br/>lifecycle sampled from<br/>real Google Trends fits"]
+    CR["<b>Creator</b> &times;30<br/>fixed quality q<br/>content vector C(t)<br/>posts r videos/week"]
+    S1["<b>Stage 1</b><br/>Poisson(100) test cohort<br/><i>every video gets this</i>"]
+    SC["<b>Score</b><br/>E = .40&middot;complete + .25&middot;share<br/>+ .20&middot;like &minus; .15&middot;skip"]
+    S2{"E &gt; 0.35 ?"}
+    AMP["<b>amplify</b><br/>reach &times; (1 + 8(E &minus; 0.35))"]
+    DROP["<b>drop</b><br/>no further reach"]
+    F["<b>Followers</b><br/>+ 0.02 &times; impressions<br/>&minus; 0.3% weekly churn"]
+
+    TE -->|"topic, intensity"| CR --> S1 --> SC --> S2
     S2 -->|yes| AMP --> F
     S2 -->|no| DROP --> F
     F -.->|"next week"| CR
-    TE -.->|"content drift<br/>C(t+1) = (1-etaI)C(t) + etaI e_trend"| CR
+    TE -.->|"content drift toward the trend"| CR
 ```
 
 **Why the pieces are shaped this way**
