@@ -3,7 +3,7 @@ requires = ["setuptools>=64"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "viral-roulette"
+name = "tiktok-creator-strategy-simulation"
 version = "1.0.0"
 description = "A calibrated Monte Carlo model of creator strategy and emergent inequality on a short-video recommendation platform"
 readme = "README.md"

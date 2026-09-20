@@ -44,7 +44,7 @@ class Simulation:
         Population size and number of weekly steps.
     calibration:
         Bundle with ``profiles`` / ``hashtags`` / ``trends`` / ``benchmarks``
-        sub-dicts, as produced by :mod:`viral_roulette.calibration`.
+        sub-dicts, as produced by :mod:`creator_strategy_sim.calibration`.
     p_trend:
         Probability of a new trend spawning per step.
     seed:

@@ -17,7 +17,7 @@ appendix of the notebook does the extraction.
 
 The HypeAuditor figures are published summary statistics rather than a
 downloadable dataset, so they are transcribed as constants in
-[`src/viral_roulette/calibration.py`](../src/viral_roulette/calibration.py)
+[`src/creator_strategy_sim/calibration.py`](../src/creator_strategy_sim/calibration.py)
 (`BENCHMARK_ER`, `BENCHMARK_TIER_DIST`) with the source named at the definition.
 
 ## Columns actually used

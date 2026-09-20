@@ -9,7 +9,7 @@ import numpy as np
 import pytest
 from scipy import stats
 
-from viral_roulette import Algorithm, Simulation, Video
+from creator_strategy_sim import Algorithm, Simulation, Video
 
 
 def _video(quality, trend_aligned=False, like_mult=1.0, share_mult=1.0):

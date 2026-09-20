@@ -8,7 +8,7 @@ test session and reused. Tests that only exercise the funnel use the synthetic
 import numpy as np
 import pytest
 
-from viral_roulette import build_calibration
+from creator_strategy_sim import build_calibration
 
 
 @pytest.fixture(scope="session")
@@ -50,7 +50,7 @@ def stub_calibration():
 @pytest.fixture
 def algo(stub_calibration):
     """An ``Algorithm`` wired to the calibrated baseline rates."""
-    from viral_roulette import Algorithm
+    from creator_strategy_sim import Algorithm
 
     cal = stub_calibration["hashtags"]
     return Algorithm(

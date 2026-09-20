@@ -3,7 +3,7 @@
 import numpy as np
 import pytest
 
-from viral_roulette import (
+from creator_strategy_sim import (
     analytical_p_viral, compute_gini, compute_lorenz,
     recovery_time_formula, theoretical_gini_lognormal,
 )

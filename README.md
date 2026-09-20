@@ -1,8 +1,8 @@
 <div align="center">
 
-# Viral Roulette
+# Algorithm or Skill?
 
-### Algorithm or Skill? A Monte Carlo simulation of creator strategy and emergent inequality on TikTok
+### A Monte Carlo simulation of creator strategy and emergent inequality on TikTok
 
 <img src="https://img.shields.io/badge/Monte%20Carlo-4%2C000%20runs-2E86AB" alt="4000 Monte Carlo runs">
 <img src="https://img.shields.io/badge/Agents-30%20creators%20%C3%97%2060%20weeks-E84855" alt="30 creators x 60 weeks">
@@ -11,9 +11,9 @@
 <img src="https://img.shields.io/badge/Python-3.9%2B-3776AB?logo=python&logoColor=white" alt="Python 3.9+">
 <img src="https://img.shields.io/badge/License-MIT-lightgrey" alt="MIT license">
 
-**[Try the interactive demo](https://rayyanmaan.github.io/viral-roulette/)** &nbsp;·&nbsp;
-**[Read the report (PDF)](report/viral-roulette-report.pdf)** &nbsp;·&nbsp;
-**[Open the notebook](notebooks/viral_roulette.ipynb)** &nbsp;·&nbsp;
+**[Try the interactive demo](https://rayyanmaan.github.io/tiktok-creator-strategy-simulation/)** &nbsp;·&nbsp;
+**[Read the report (PDF)](report/algorithm-or-skill.pdf)** &nbsp;·&nbsp;
+**[Open the notebook](notebooks/creator_strategy_simulation.ipynb)** &nbsp;·&nbsp;
 **[Jump to results](#results)**
 
 </div>
@@ -101,7 +101,7 @@ churn. Two different definitions of "doing well", two different winners.
 
 ## Try it in the browser
 
-**[rayyanmaan.github.io/viral-roulette](https://rayyanmaan.github.io/viral-roulette/)** — *The Amplification Gate*
+**[rayyanmaan.github.io/tiktok-creator-strategy-simulation](https://rayyanmaan.github.io/tiktok-creator-strategy-simulation/)** — *The Amplification Gate*
 is a live bench test of the funnel. Drag a video's production quality, pick a topic, switch a trend on, and
 2,000 test cohorts are simulated in the browser using the model's real equations. Watch the score distribution
 slide across the `E = 0.35` gate and the amplification probability move with it.
@@ -252,7 +252,7 @@ model from collapsing topic choice into a single scalar "good topic" dimension.
 ## Theory
 
 The simulation is checked against closed-form results rather than just described.
-All four are implemented in [`src/viral_roulette/theory.py`](src/viral_roulette/theory.py).
+All four are implemented in [`src/creator_strategy_sim/theory.py`](src/creator_strategy_sim/theory.py).
 
 **1. Virality probability.** Each engagement component is a scaled Binomial, so
 `E[p̂_j] = p_j` and `Var(p̂_j) = p_j(1-p_j)/n`. With `n = 100`, a normal
@@ -477,14 +477,14 @@ strategy does" — not "here is what TikTok does".
 ## Reproducing it
 
 ```bash
-git clone https://github.com/rayyanmaan/viral-roulette.git
-cd viral-roulette
+git clone https://github.com/rayyanmaan/tiktok-creator-strategy-simulation.git
+cd tiktok-creator-strategy-simulation
 
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
 
 pytest                                    # 15 tests, ~30s
-jupyter lab notebooks/viral_roulette.ipynb
+jupyter lab notebooks/creator_strategy_simulation.ipynb
 ```
 
 The notebook runs top to bottom with no manual downloads — every dataset is in
@@ -494,7 +494,7 @@ The notebook runs top to bottom with no manual downloads — every dataset is in
 Or drive the model directly:
 
 ```python
-from viral_roulette import build_calibration, run_monte_carlo
+from creator_strategy_sim import build_calibration, run_monte_carlo
 
 cal = build_calibration()
 res = run_monte_carlo("trend_chaser", cal, n_runs=1000, p_trend=0.12)
@@ -521,7 +521,7 @@ twelve and shifts the baseline like rate from 0.1478 to 0.1388, propagating into
 every downstream engagement probability.
 
 The packaged version pins the published set in
-[`PUBLISHED_TOPICS`](src/viral_roulette/calibration.py) and documents why, so
+[`PUBLISHED_TOPICS`](src/creator_strategy_sim/calibration.py) and documents why, so
 the numbers in the report reproduce on any pandas. Passing
 `pinned_topics=None` restores the original frequency-ranked behaviour.
 
@@ -542,14 +542,14 @@ exactly — all four strategies, all four metrics, to four decimal places:
 ## Repository map
 
 ```
-viral-roulette/
+tiktok-creator-strategy-simulation/
 ├── README.md
 ├── report/
-│   ├── viral-roulette-report.pdf     16-page write-up, figures embedded
-│   └── viral-roulette-report.tex     LaTeX source
+│   ├── algorithm-or-skill.pdf        16-page write-up, figures embedded
+│   └── algorithm-or-skill.tex        LaTeX source
 ├── notebooks/
-│   └── viral_roulette.ipynb          full executable analysis, A0 → A11
-├── src/viral_roulette/               the model, extracted as an installable package
+│   └── creator_strategy_simulation.ipynb   full executable analysis, A0 → A11
+├── src/creator_strategy_sim/         the model, extracted as an installable package
 │   ├── config.py                     strategies, sizing, funnel constants
 │   ├── calibration.py                four datasets → model parameters
 │   ├── creator.py                    Creator agent + Video record
@@ -564,6 +564,9 @@ viral-roulette/
 ├── assets/figures/                   every figure, at publication resolution
 └── docs/index.html                   the interactive funnel demo (GitHub Pages)
 ```
+
+The distribution is named `tiktok-creator-strategy-simulation`; the import
+package is the shorter `creator_strategy_sim`.
 
 **Notebook ↔ package.** The notebook is the analysis of record and runs
 standalone. The package is the same model extracted, documented and tested, so
@@ -597,6 +600,6 @@ Full provenance, columns used and licensing: [`data/README.md`](data/README.md).
 
 <div align="center">
 
-**Rayyan Maan** · MIT licensed · [Report](report/viral-roulette-report.pdf) · [Notebook](notebooks/viral_roulette.ipynb) · [Data](data/README.md)
+**Rayyan Maan** · MIT licensed · [Report](report/algorithm-or-skill.pdf) · [Notebook](notebooks/creator_strategy_simulation.ipynb) · [Data](data/README.md)
 
 </div>

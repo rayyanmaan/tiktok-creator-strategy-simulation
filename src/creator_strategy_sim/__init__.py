@@ -1,9 +1,12 @@
-"""viral-roulette -- a calibrated Monte Carlo model of creator strategy on a
-short-video recommendation platform.
+"""creator_strategy_sim -- a calibrated Monte Carlo model of creator strategy and
+emergent inequality on a short-video recommendation platform.
+
+Distributed as ``tiktok-creator-strategy-simulation``; imported as
+``creator_strategy_sim``.
 
 Quick start
 -----------
->>> from viral_roulette import build_calibration, run_monte_carlo
+>>> from creator_strategy_sim import build_calibration, run_monte_carlo
 >>> cal = build_calibration()
 >>> res = run_monte_carlo("trend_chaser", cal, n_runs=50)
 >>> res["viral_rate"].mean()          # doctest: +SKIP

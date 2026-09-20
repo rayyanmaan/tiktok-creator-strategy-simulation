@@ -34,7 +34,7 @@ class Creator:
     creator_id:
         Unique identifier within a run.
     strategy:
-        One of the keys of :data:`~viral_roulette.config.STRATEGY_PARAMS`.
+        One of the keys of :data:`~creator_strategy_sim.config.STRATEGY_PARAMS`.
     initial_followers:
         Starting follower count, sampled from the real tier distribution.
     topics:

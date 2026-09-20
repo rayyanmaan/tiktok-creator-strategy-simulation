@@ -2,7 +2,7 @@
 
 Every number in this module is either (a) an explicit modelling choice that is
 argued for in the report, or (b) a value calibrated from real data in
-:mod:`viral_roulette.calibration`. Nothing is a silent magic constant.
+:mod:`creator_strategy_sim.calibration`. Nothing is a silent magic constant.
 """
 
 from __future__ import annotations
