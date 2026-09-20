@@ -1,0 +1,663 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Amplification Gate</title>
+<meta name="description" content="An interactive bench test of the recommendation funnel from Viral Roulette: push a video through 2,000 simulated test cohorts and watch it hit the amplification threshold.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  :root{
+    color-scheme: light;
+    --ground:#F2F6F7;
+    --surface:#FFFFFF;
+    --surface-2:#E9F0F3;
+    --ink:#0F171D;
+    --muted:#5A6B75;
+    --line:#D3DEE3;
+    --line-strong:#B4C4CC;
+    --accent:#2E86AB;
+    --gate:#E84855;
+    --pass:#3BB273;
+    --warm:#F4A261;
+    --shadow:0 1px 2px rgba(15,23,29,.06), 0 8px 24px -16px rgba(15,23,29,.35);
+    --sans:"IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    --cond:"IBM Plex Sans Condensed", "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    --mono:"IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme: dark;
+      --ground:#0B1114;
+      --surface:#131C22;
+      --surface-2:#1A252C;
+      --ink:#E4EDF1;
+      --muted:#8CA2AE;
+      --line:#243139;
+      --line-strong:#33454F;
+      --accent:#57A9C9;
+      --gate:#F26B76;
+      --pass:#55C48C;
+      --warm:#F0B27C;
+      --shadow:0 1px 2px rgba(0,0,0,.5), 0 8px 24px -16px rgba(0,0,0,.9);
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme: dark;
+    --ground:#0B1114;
+    --surface:#131C22;
+    --surface-2:#1A252C;
+    --ink:#E4EDF1;
+    --muted:#8CA2AE;
+    --line:#243139;
+    --line-strong:#33454F;
+    --accent:#57A9C9;
+    --gate:#F26B76;
+    --pass:#55C48C;
+    --warm:#F0B27C;
+    --shadow:0 1px 2px rgba(0,0,0,.5), 0 8px 24px -16px rgba(0,0,0,.9);
+  }
+
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:var(--ground);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-size:15px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  img{max-width:100%}
+  a{color:var(--accent)}
+  a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{
+    outline:2px solid var(--accent); outline-offset:2px; border-radius:2px;
+  }
+
+  .wrap{max-width:1000px;margin:0 auto;padding-inline:20px;padding-block:0 64px}
+
+  /* ---- masthead: a thin instrument label, not a hero ---- */
+  .mast{
+    border-bottom:1px solid var(--line);
+    padding-block:22px 18px;
+    display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 18px;
+  }
+  .mast h1{
+    font-family:var(--cond);font-weight:700;font-size:clamp(26px,5vw,38px);
+    letter-spacing:-.01em;margin:0;text-wrap:balance;
+  }
+  .mast .from{
+    font-family:var(--mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;
+    color:var(--muted);
+  }
+  .lede{
+    margin:18px 0 0;max-width:62ch;color:var(--muted);font-size:15.5px;
+  }
+  .lede strong{color:var(--ink);font-weight:600}
+
+  /* ---- the bench ---- */
+  .bench{
+    margin-top:28px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:4px;
+    box-shadow:var(--shadow);
+    display:grid;
+    grid-template-columns:minmax(0,300px) minmax(0,1fr);
+  }
+  @media (max-width:760px){ .bench{grid-template-columns:1fr} }
+
+  .controls{
+    border-right:1px solid var(--line);
+    padding:20px;
+    display:flex;flex-direction:column;gap:22px;
+  }
+  @media (max-width:760px){ .controls{border-right:0;border-bottom:1px solid var(--line)} }
+
+  .eyebrow{
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;
+    color:var(--muted);margin:0 0 10px;
+  }
+
+  .ctl{display:flex;flex-direction:column;gap:7px}
+  .ctl-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .ctl-head label{font-weight:600;font-size:13.5px}
+  .ctl-val{font-family:var(--mono);font-size:13px;font-variant-numeric:tabular-nums;color:var(--accent);font-weight:500}
+  .ctl-note{font-size:12px;color:var(--muted);line-height:1.45}
+
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;width:100%;height:22px;background:transparent;margin:0;cursor:grab;
+  }
+  input[type=range]:active{cursor:grabbing}
+  input[type=range]::-webkit-slider-runnable-track{height:4px;background:var(--line-strong);border-radius:2px}
+  input[type=range]::-moz-range-track{height:4px;background:var(--line-strong);border-radius:2px}
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;appearance:none;width:16px;height:16px;border-radius:50%;
+    background:var(--accent);border:2px solid var(--surface);margin-top:-6px;
+    box-shadow:0 0 0 1px var(--accent);
+  }
+  input[type=range]::-moz-range-thumb{
+    width:16px;height:16px;border-radius:50%;background:var(--accent);
+    border:2px solid var(--surface);box-shadow:0 0 0 1px var(--accent);
+  }
+
+  select{
+    font-family:var(--mono);font-size:13px;width:100%;padding:7px 9px;
+    background:var(--surface-2);color:var(--ink);
+    border:1px solid var(--line-strong);border-radius:3px;
+  }
+
+  .switch{display:flex;align-items:center;gap:9px;cursor:pointer;font-size:13.5px;font-weight:600}
+  .switch input{width:16px;height:16px;accent-color:var(--accent);cursor:pointer;margin:0}
+
+  .presets{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{
+    font-family:var(--mono);font-size:11.5px;letter-spacing:.02em;
+    padding:5px 9px;border-radius:3px;cursor:pointer;
+    background:transparent;color:var(--ink);
+    border:1px solid var(--line-strong);
+    border-left:3px solid var(--chip,var(--line-strong));
+    transition:background .12s ease;
+  }
+  .chip:hover{background:var(--surface-2)}
+  .chip[aria-pressed="true"]{background:var(--surface-2);border-color:var(--chip,var(--accent))}
+
+  /* ---- readouts ---- */
+  .readout{padding:20px;display:flex;flex-direction:column;gap:18px;min-width:0}
+
+  .verdict{
+    display:flex;flex-wrap:wrap;align-items:flex-end;gap:6px 26px;
+  }
+  .big{
+    font-family:var(--mono);font-weight:600;font-variant-numeric:tabular-nums;
+    font-size:clamp(38px,9vw,54px);line-height:1;letter-spacing:-.02em;
+  }
+  .big-label{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px}
+  .stat{display:flex;flex-direction:column}
+  .stat .num{font-family:var(--mono);font-size:19px;font-weight:500;font-variant-numeric:tabular-nums}
+
+  .chartbox{position:relative;width:100%}
+  canvas{display:block;width:100%;height:auto}
+  .caption{font-size:12px;color:var(--muted);margin:8px 0 0;line-height:1.5}
+
+  /* score decomposition */
+  .terms{border-top:1px solid var(--line);padding-top:14px;margin-top:auto;display:flex;flex-direction:column;gap:7px}
+  .term{display:grid;grid-template-columns:88px 1fr 66px;align-items:center;gap:10px;font-size:12.5px}
+  .term-name{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  .bar{height:8px;background:var(--surface-2);border-radius:1px;position:relative;overflow:hidden}
+  .bar i{display:block;height:100%;border-radius:1px}
+  .term-val{font-family:var(--mono);font-size:12px;font-variant-numeric:tabular-nums;text-align:right}
+
+  /* ---- prose sections ---- */
+  section{margin-top:44px}
+  h2{
+    font-family:var(--cond);font-weight:700;font-size:21px;margin:0 0 12px;
+    letter-spacing:-.005em;
+  }
+  p{margin:0 0 14px;max-width:66ch}
+  .muted{color:var(--muted)}
+  .formula{
+    font-family:var(--mono);font-size:13.5px;max-width:none;
+    background:var(--surface);border:1px solid var(--line);
+    border-left:3px solid var(--accent);border-radius:3px;
+    padding:12px 14px;margin:0 0 16px;overflow-x:auto;white-space:nowrap;
+  }
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:4px;background:var(--surface)}
+  th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+  th{
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;
+    color:var(--muted);font-weight:500;background:var(--surface-2);
+  }
+  tr:last-child td{border-bottom:0}
+  td.n{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right}
+  td .swatch{display:inline-block;width:8px;height:8px;border-radius:1px;margin-right:8px;vertical-align:baseline}
+
+  .foot{
+    margin-top:48px;padding-top:18px;border-top:1px solid var(--line);
+    font-size:13px;color:var(--muted);
+    display:flex;flex-wrap:wrap;gap:8px 20px;align-items:baseline;
+  }
+
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="mast">
+    <h1>The Amplification Gate</h1>
+    <span class="from">Viral Roulette &middot; bench test of the recommendation funnel</span>
+  </header>
+
+  <p class="lede">
+    Every video in the model gets the same first chance: a random cohort of roughly 100 viewers,
+    regardless of who made it. What happens next is decided by a single number.
+    Clear an engagement score of <strong>0.35</strong> and reach expands. Miss it and the video stops dead.
+    This bench pushes one video through <strong>2,000 independent test cohorts</strong> using the
+    model's real equations, and shows you where it lands.
+  </p>
+
+  <div class="bench">
+    <div class="controls">
+      <div>
+        <p class="eyebrow">Video under test</p>
+        <div class="ctl">
+          <div class="ctl-head">
+            <label for="q">Production quality <span class="mono">q</span></label>
+            <span class="ctl-val" id="q-val">0.58</span>
+          </div>
+          <input type="range" id="q" min="0.05" max="1" step="0.01" value="0.58">
+          <p class="ctl-note">Drives completion, likes and skips. Fixed for a creator across a whole run &mdash; no learning.</p>
+        </div>
+      </div>
+
+      <div class="ctl">
+        <div class="ctl-head">
+          <label for="topic">Content topic</label>
+        </div>
+        <select id="topic"></select>
+        <p class="ctl-note" id="topic-note">Like and share multipliers, measured from 1,200 real videos.</p>
+      </div>
+
+      <div class="ctl">
+        <label class="switch" for="trend">
+          <input type="checkbox" id="trend">
+          Riding a live trend
+        </label>
+        <div class="ctl-head">
+          <label for="intensity">Trend intensity <span class="mono">I</span></label>
+          <span class="ctl-val" id="i-val">0.70</span>
+        </div>
+        <input type="range" id="intensity" min="0" max="1" step="0.01" value="0.7" disabled>
+        <p class="ctl-note">Alignment multiplies share probability by 1.4 and lifts effective quality by <span class="mono">1 + 0.8I</span>.</p>
+      </div>
+
+      <div>
+        <p class="eyebrow">Jump to a strategy</p>
+        <div class="presets" id="presets"></div>
+        <p class="ctl-note" style="margin-top:9px">Sets <span class="mono">q</span> to that strategy's mean quality.</p>
+      </div>
+    </div>
+
+    <div class="readout">
+      <div class="verdict">
+        <div>
+          <span class="big-label">Videos amplified</span>
+          <span class="big" id="pviral">&ndash;</span>
+        </div>
+        <div class="stat">
+          <span class="big-label">Mean score E</span>
+          <span class="num" id="meanE">&ndash;</span>
+        </div>
+        <div class="stat">
+          <span class="big-label">Median reach</span>
+          <span class="num" id="reach">&ndash;</span>
+        </div>
+        <div class="stat">
+          <span class="big-label">New followers</span>
+          <span class="num" id="followers">&ndash;</span>
+        </div>
+      </div>
+
+      <div class="chartbox">
+        <canvas id="hist" width="1200" height="440" role="img"
+                aria-label="Histogram of engagement scores across 2,000 simulated test cohorts, with the amplification threshold at 0.35 marked."></canvas>
+        <p class="caption" id="cap"></p>
+      </div>
+
+      <div class="terms" id="terms"></div>
+    </div>
+  </div>
+
+  <section>
+    <h2>What the bench is actually computing</h2>
+    <p>
+      For each of the 2,000 trials it draws a cohort size from <span class="mono">Poisson(100)</span>, then
+      samples four independent behaviours per viewer &mdash; completion, share, like, skip &mdash; at probabilities
+      that depend on quality and on the topic's measured multipliers. The score is the weighted empirical rate:
+    </p>
+    <p class="formula">E&nbsp;= 0.40&nbsp;&times;&nbsp;completion &nbsp;+&nbsp; 0.25&nbsp;&times;&nbsp;share &nbsp;+&nbsp; 0.20&nbsp;&times;&nbsp;like &nbsp;&minus;&nbsp; 0.15&nbsp;&times;&nbsp;skip</p>
+    <p>
+      Completion outranks shares, shares outrank likes, skips subtract. Those weights are a stated modelling
+      choice, not a fitted parameter. The two scale factors inside the like and share probabilities
+      (<span class="mono">35.0</span> and <span class="mono">21.0</span>) were <em>solved for</em> so that an
+      average video &mdash; <span class="mono">q&nbsp;=&nbsp;0.5</span> &mdash; scores about 0.32, just
+      <em>below</em> the gate. If average content cleared the bar by default there would be no strategy
+      trade-off left to measure.
+    </p>
+    <p class="muted">
+      Slide quality past roughly 0.55 and you can watch the distribution cross the line. That crossing point is
+      the single fact that anchors every result in the study.
+    </p>
+  </section>
+
+  <section>
+    <h2>Where the four strategies sit</h2>
+    <p>
+      Each strategy is a fixed quality distribution plus a posting rate and a trend appetite. Over 1,000
+      simulated years each, they end up statistically tied on follower count &mdash; and cleanly separated on
+      everything else.
+    </p>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Strategy</th>
+            <th scope="col" style="text-align:right">Mean q</th>
+            <th scope="col" style="text-align:right">Posts/wk</th>
+            <th scope="col" style="text-align:right">Viral rate</th>
+            <th scope="col" style="text-align:right">Survival</th>
+            <th scope="col" style="text-align:right">Final followers</th>
+          </tr>
+        </thead>
+        <tbody id="strat-table"></tbody>
+      </table>
+    </div>
+    <p class="caption" style="margin-top:10px">
+      Survival = the run ended with more followers than it started. The trend chaser goes viral least often and
+      survives most often, because three posts a week buys three independent shots at the gate.
+    </p>
+  </section>
+
+  <footer class="foot">
+    <span><strong style="color:var(--ink)">Viral Roulette</strong> &mdash; Rayyan Maan</span>
+    <a href="https://github.com/rayyanmaan/viral-roulette">Repository</a>
+    <a href="https://github.com/rayyanmaan/viral-roulette/blob/main/report/viral-roulette-report.pdf">Report (PDF)</a>
+    <a href="https://github.com/rayyanmaan/viral-roulette/blob/main/notebooks/viral_roulette.ipynb">Notebook</a>
+  </footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // --- calibrated constants (identical to src/viral_roulette) ---------------
+  var BASE_LIKE = 0.1478, BASE_SHARE = 0.0041;
+  var LIKE_SCALE = 35.0, SHARE_SCALE = 21.0;
+  var W_COMP = 0.40, W_SHARE = 0.25, W_LIKE = 0.20, W_SKIP = 0.15;
+  var THETA = 0.35, ALPHA = 8.0, CONVERSION = 0.02, N_TEST = 100;
+  var TRIALS = 2000;
+
+  // topic -> [like multiplier, share multiplier], measured in Appendix A1b
+  var TOPICS = {
+    lmao:[1.2512,1.2241], jokes:[1.2146,0.9796], memes:[1.0488,1.3098],
+    funnymemes:[0.9937,1.0209], love:[0.9933,0.8075], lol:[0.9835,1.0523],
+    meme:[0.9737,0.9369], humor:[0.9540,1.2291], laugh:[0.9485,0.9354],
+    comedy:[0.9484,1.0732], fun:[0.8835,0.6078], funny:[0.8067,0.8235]
+  };
+
+  var STRATEGIES = [
+    {key:"niche",   name:"Niche Specialist", q:0.58, posts:2, viral:0.3990, surv:0.0735, f:"13,296", color:"#2E86AB"},
+    {key:"chaser",  name:"Trend Chaser",     q:0.30, posts:3, viral:0.0495, surv:0.1056, f:"13,351", color:"#E84855"},
+    {key:"quality", name:"Quality-Focused",  q:0.88, posts:1, viral:1.0000, surv:0.0640, f:"13,281", color:"#3BB273"},
+    {key:"random",  name:"Random Baseline",  q:0.45, posts:2, viral:0.1980, surv:0.0655, f:"13,282", color:"#F4A261"}
+  ];
+
+  function clip(x, lo, hi){ return x < lo ? lo : (x > hi ? hi : x); }
+
+  // Knuth's method; lambda = 100 keeps exp(-lambda) well inside double range.
+  function poisson(lambda){
+    var L = Math.exp(-lambda), k = 0, p = 1;
+    do { k++; p *= Math.random(); } while (p > L);
+    return k - 1;
+  }
+  function binomial(n, p){
+    if (p <= 0) return 0;
+    if (p >= 1) return n;
+    var c = 0;
+    for (var i = 0; i < n; i++) if (Math.random() < p) c++;
+    return c;
+  }
+
+  // --- the model -----------------------------------------------------------
+  function probabilities(q, mLike, mShare, aligned, intensity){
+    var qEff = aligned ? clip(q * (1 + 0.8 * intensity), 0.01, 1.0) : q;
+    return {
+      q: qEff,
+      complete: 1 / (1 + Math.exp(-6 * (qEff - 0.5))),
+      like: clip(qEff * mLike * BASE_LIKE * LIKE_SCALE, 0, 0.95),
+      share: clip(qEff * mShare * BASE_SHARE * SHARE_SCALE * (aligned ? 1.4 : 1.0), 0, 0.95),
+      skip: clip(1 - qEff * 0.9, 0.05, 0.95)
+    };
+  }
+
+  function bench(p){
+    var scores = new Float64Array(TRIALS);
+    var viral = 0, sumE = 0, reach = [], followers = 0;
+    for (var t = 0; t < TRIALS; t++){
+      var n = Math.max(poisson(N_TEST), 1);
+      var E = W_COMP * (binomial(n, p.complete) / n)
+            + W_SHARE * (binomial(n, p.share) / n)
+            + W_LIKE  * (binomial(n, p.like) / n)
+            - W_SKIP  * (binomial(n, p.skip) / n);
+      scores[t] = E; sumE += E;
+      var impressions = n;
+      if (E > THETA){ viral++; impressions = Math.floor(n * (1 + ALPHA * (E - THETA))); }
+      reach.push(impressions);
+      followers += impressions * CONVERSION;
+    }
+    reach.sort(function(a,b){ return a - b; });
+    return {
+      scores: scores,
+      pViral: viral / TRIALS,
+      meanE: sumE / TRIALS,
+      medianReach: reach[Math.floor(TRIALS / 2)],
+      meanFollowers: followers / TRIALS
+    };
+  }
+
+  // --- chart ---------------------------------------------------------------
+  var canvas = document.getElementById("hist");
+  var ctx = canvas.getContext("2d");
+
+  function token(name){
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+
+  function drawHistogram(res){
+    var cssW = canvas.clientWidth || 800;
+    var cssH = Math.max(230, Math.min(300, Math.round(cssW * 0.38)));
+    var dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.round(cssW * dpr);
+    canvas.height = Math.round(cssH * dpr);
+    canvas.style.height = cssH + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, cssW, cssH);
+
+    var padL = 8, padR = 8, padT = 22, padB = 34;
+    var w = cssW - padL - padR, h = cssH - padT - padB;
+
+    // Fixed domain on purpose: the axis must not rescale as you drag, or the
+    // distance from the gate stops being comparable between settings.
+    var LO = -0.05, HI = 0.70, BINS = 68;
+    var counts = new Array(BINS).fill(0), max = 0;
+    for (var i = 0; i < res.scores.length; i++){
+      var b = Math.floor((res.scores[i] - LO) / (HI - LO) * BINS);
+      if (b < 0) b = 0; if (b >= BINS) b = BINS - 1;
+      counts[b]++;
+      if (counts[b] > max) max = counts[b];
+    }
+
+    var line = token("--line"), muted = token("--muted");
+    var accent = token("--accent"), gate = token("--gate"), pass = token("--pass");
+
+    function x(v){ return padL + (v - LO) / (HI - LO) * w; }
+
+    // baseline
+    ctx.strokeStyle = line; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(padL, padT + h + 0.5); ctx.lineTo(padL + w, padT + h + 0.5); ctx.stroke();
+
+    // bars
+    var bw = w / BINS;
+    for (var j = 0; j < BINS; j++){
+      if (!counts[j]) continue;
+      var centre = LO + (j + 0.5) / BINS * (HI - LO);
+      var bh = counts[j] / max * h;
+      ctx.fillStyle = centre > THETA ? pass : accent;
+      ctx.globalAlpha = centre > THETA ? 0.92 : 0.55;
+      ctx.fillRect(padL + j * bw, padT + h - bh, Math.max(bw - 0.7, 0.8), bh);
+    }
+    ctx.globalAlpha = 1;
+
+    // the gate
+    var gx = x(THETA);
+    ctx.strokeStyle = gate; ctx.lineWidth = 1.5;
+    ctx.setLineDash([5, 4]);
+    ctx.beginPath(); ctx.moveTo(gx, padT - 6); ctx.lineTo(gx, padT + h); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = gate;
+    ctx.font = '600 11px "IBM Plex Mono", ui-monospace, monospace';
+    var lbl = "gate  E = 0.35";
+    var lw = ctx.measureText(lbl).width;
+    var anchorRight = gx + lw + 8 > padL + w;
+    ctx.textAlign = anchorRight ? "right" : "left";
+    ctx.fillText(lbl, anchorRight ? gx - 7 : gx + 7, padT - 8);
+
+    // axis ticks
+    ctx.fillStyle = muted; ctx.textAlign = "center";
+    ctx.font = '400 11px "IBM Plex Mono", ui-monospace, monospace';
+    [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7].forEach(function (v){
+      var px = x(v);
+      ctx.strokeStyle = line; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(px, padT + h); ctx.lineTo(px, padT + h + 4); ctx.stroke();
+      ctx.fillText(v.toFixed(1), px, padT + h + 18);
+    });
+    ctx.textAlign = "left";
+    ctx.fillText("engagement score E", padL, cssH - 2);
+  }
+
+  // --- wiring --------------------------------------------------------------
+  var qEl = document.getElementById("q"),
+      topicEl = document.getElementById("topic"),
+      trendEl = document.getElementById("trend"),
+      intEl = document.getElementById("intensity");
+
+  Object.keys(TOPICS).forEach(function (t){
+    var o = document.createElement("option");
+    o.value = t; o.textContent = "#" + t;
+    topicEl.appendChild(o);
+  });
+  topicEl.value = "memes";
+
+  var presets = document.getElementById("presets");
+  STRATEGIES.forEach(function (s){
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "chip"; b.textContent = s.name;
+    b.style.setProperty("--chip", s.color);
+    b.setAttribute("aria-pressed", "false");
+    b.addEventListener("click", function (){
+      qEl.value = String(s.q);
+      update();
+    });
+    presets.appendChild(b);
+  });
+
+  var tbody = document.getElementById("strat-table");
+  STRATEGIES.forEach(function (s){
+    var tr = document.createElement("tr");
+    tr.innerHTML =
+      '<td><span class="swatch" style="background:' + s.color + '"></span>' + s.name + "</td>" +
+      '<td class="n">' + s.q.toFixed(2) + "</td>" +
+      '<td class="n">' + s.posts + "</td>" +
+      '<td class="n">' + s.viral.toFixed(4) + "</td>" +
+      '<td class="n">' + s.surv.toFixed(4) + "</td>" +
+      '<td class="n">' + s.f + "</td>";
+    tbody.appendChild(tr);
+  });
+
+  var TERMS = [
+    {key:"complete", label:"completion", weight: W_COMP,  sign:1, color:"--accent"},
+    {key:"share",    label:"share",      weight: W_SHARE, sign:1, color:"--pass"},
+    {key:"like",     label:"like",       weight: W_LIKE,  sign:1, color:"--warm"},
+    {key:"skip",     label:"skip",       weight: W_SKIP,  sign:-1, color:"--gate"}
+  ];
+  var termsBox = document.getElementById("terms");
+  var termEls = TERMS.map(function (t){
+    var row = document.createElement("div");
+    row.className = "term";
+    row.innerHTML =
+      '<span class="term-name">' + (t.sign < 0 ? "&minus; " : "+ ") + t.label + "</span>" +
+      '<span class="bar"><i style="background:var(' + t.color + ');width:0%"></i></span>' +
+      '<span class="term-val">0.000</span>';
+    termsBox.appendChild(row);
+    return { fill: row.querySelector("i"), val: row.querySelector(".term-val") };
+  });
+
+  var lastResult = null;
+
+  function update(){
+    var q = parseFloat(qEl.value);
+    var intensity = parseFloat(intEl.value);
+    var aligned = trendEl.checked;
+    var mult = TOPICS[topicEl.value];
+
+    intEl.disabled = !aligned;
+    document.getElementById("q-val").textContent = q.toFixed(2);
+    document.getElementById("i-val").textContent = intensity.toFixed(2);
+    document.getElementById("topic-note").textContent =
+      "Like multiplier " + mult[0].toFixed(2) + ", share multiplier " + mult[1].toFixed(2) +
+      " — measured from 1,200 real videos.";
+
+    Array.prototype.forEach.call(presets.children, function (b, i){
+      b.setAttribute("aria-pressed", Math.abs(STRATEGIES[i].q - q) < 0.005 ? "true" : "false");
+    });
+
+    var p = probabilities(q, mult[0], mult[1], aligned, intensity);
+    var res = bench(p);
+    lastResult = res;
+
+    var pv = document.getElementById("pviral");
+    pv.textContent = (res.pViral * 100).toFixed(1) + "%";
+    pv.style.color = res.pViral >= 0.5 ? "var(--pass)" : (res.pViral <= 0.05 ? "var(--gate)" : "var(--ink)");
+
+    document.getElementById("meanE").textContent = res.meanE.toFixed(3);
+    document.getElementById("reach").textContent = res.medianReach.toLocaleString();
+    document.getElementById("followers").textContent = res.meanFollowers.toFixed(1);
+
+    // expected-value decomposition of the score
+    var maxTerm = Math.max.apply(null, TERMS.map(function (t){ return t.weight * p[t.key]; }));
+    TERMS.forEach(function (t, i){
+      var v = t.weight * p[t.key];
+      termEls[i].fill.style.width = (maxTerm > 0 ? (v / maxTerm * 100) : 0).toFixed(1) + "%";
+      termEls[i].val.textContent = (t.sign < 0 ? "−" : "") + v.toFixed(3);
+    });
+
+    var aboveNote = res.pViral > 0.995 ? "Essentially every cohort clears it."
+                  : res.pViral < 0.005 ? "Essentially no cohort clears it."
+                  : (res.pViral * 100).toFixed(1) + "% of cohorts land to the right of the gate.";
+    document.getElementById("cap").textContent =
+      "2,000 test cohorts at q = " + p.q.toFixed(2) +
+      (aligned ? " (trend-boosted from " + q.toFixed(2) + ")" : "") +
+      " on #" + topicEl.value + ". " + aboveNote;
+
+    drawHistogram(res);
+  }
+
+  qEl.addEventListener("input", update);
+  intEl.addEventListener("input", update);
+  topicEl.addEventListener("change", update);
+  trendEl.addEventListener("change", update);
+
+  var resizeTimer;
+  window.addEventListener("resize", function (){
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function (){ if (lastResult) drawHistogram(lastResult); }, 120);
+  });
+
+  if (window.matchMedia){
+    var mq = window.matchMedia("(prefers-color-scheme: dark)");
+    var onTheme = function (){ if (lastResult) drawHistogram(lastResult); };
+    if (mq.addEventListener) mq.addEventListener("change", onTheme);
+    else if (mq.addListener) mq.addListener(onTheme);
+  }
+
+  update();
+})();
+</script>
+</body>
+</html>

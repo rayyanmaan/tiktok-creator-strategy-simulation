@@ -11,6 +11,7 @@
 <img src="https://img.shields.io/badge/Python-3.9%2B-3776AB?logo=python&logoColor=white" alt="Python 3.9+">
 <img src="https://img.shields.io/badge/License-MIT-lightgrey" alt="MIT license">
 
+**[Try the interactive demo](https://rayyanmaan.github.io/viral-roulette/)** &nbsp;·&nbsp;
 **[Read the report (PDF)](report/viral-roulette-report.pdf)** &nbsp;·&nbsp;
 **[Open the notebook](notebooks/viral_roulette.ipynb)** &nbsp;·&nbsp;
 **[Jump to results](#results)**
@@ -95,6 +96,15 @@ churn. Two different definitions of "doing well", two different winners.
 <img src="assets/figures/fig5_animation.gif" width="720" alt="Animated follower trajectories for all four strategies over 60 simulated weeks, with trend windows shaded">
 <br><em>One run, 60 weeks. All four strategies drift down under churn; the trend chaser drifts slowest.</em>
 </p>
+
+---
+
+## Try it in the browser
+
+**[rayyanmaan.github.io/viral-roulette](https://rayyanmaan.github.io/viral-roulette/)** — *The Amplification Gate*
+is a live bench test of the funnel. Drag a video's production quality, pick a topic, switch a trend on, and
+2,000 test cohorts are simulated in the browser using the model's real equations. Watch the score distribution
+slide across the `E = 0.35` gate and the amplification probability move with it.
 
 ---
 
@@ -554,7 +564,8 @@ viral-roulette/
 │   └── metrics.py                    Gini, Lorenz, confidence intervals
 ├── tests/                            15 tests: correctness, reproducibility, theory
 ├── data/                             all four datasets + provenance README
-└── assets/figures/                   every figure, at publication resolution
+├── assets/figures/                   every figure, at publication resolution
+└── docs/index.html                   the interactive funnel demo (GitHub Pages)
 ```
 
 **Notebook ↔ package.** The notebook is the analysis of record and runs
